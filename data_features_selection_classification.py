@@ -99,7 +99,7 @@ def get_feature_comb_score(brand, features_comb):
 
         f1_values = []
 
-        xgb = XGBClassifier(**params, verbosity = 0)
+        xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1')
 
         for train_index, test_index in tscv.split(X):
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
@@ -125,7 +125,7 @@ def get_feature_comb_score(brand, features_comb):
 
             #Evaluation
 
-            f1 = f1_score(y_test, y_pred, average = 'binary', pos_label=1) #average = 'macro')
+            f1 = f1_score(y_test, y_pred, average = 'binary', pos_label=1)
             #weight = weight + 1.05**weight
             #divider = divider + weight
             f1_values.append(f1) #*weight

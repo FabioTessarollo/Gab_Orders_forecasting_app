@@ -34,12 +34,13 @@ for brand in perimeter:
     X_cat_cols = [col for col in df.columns if col in cat_cols]
     X_scalar_cols = [col for col in df.columns if col != target and col not in X_cat_cols]
 
-    xgb = XGBClassifier(**params, verbosity = 0, n_jobs = 5, verbose=False, scoring = 'f1' )
+    xgb = XGBClassifier(**params, verbosity = 0, n_jobs = 5, verbose=False, scoring = 'f1')
 
     X_cols = [col for col in df.columns if col != target]
     X = df[X_cols]
     y = df[[target]]
 
+    #togliere split, train su tutto dataset
     test_index_start = int(len(X)*0.80)
     train_index = list(range(0, test_index_start))
     test_index = list(range(test_index_start, len(X)))

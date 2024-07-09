@@ -30,7 +30,7 @@ def add_month_variation_target(df, target):
     rolling_back = df[target].rolling(window=four_weeks).sum()#.mean()
     rolling_ahead =  df[target].shift(-1) + df[target].shift(-2) + df[target].shift(-3) + df[target].shift(-4) #df[target].shift(-1) + df[target].shift(-2) + df[target].shift(-3) + df[target].shift(-4)
     month_variation_Series = (rolling_ahead - rolling_back) / rolling_back
-    quantile_85 = month_variation_Series.quantile(0.70)
+    quantile_85 = month_variation_Series.quantile(0.75)
     print(quantile_85)
     df['month_variation'] = month_variation_Series.apply(lambda x : 1 if x > quantile_85 else 0)
     df.dropna(inplace = True)
