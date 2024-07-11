@@ -8,7 +8,7 @@ import pandas as pd
 target = 'qty'
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
 rolling_look_back = 4
-look_back = 8
+look_back = 6 #utilizzare -1, -2, -3, -4, -8 ?
 
 def add_rolling_features(df, cols, rolling_look_back):
     for col in cols:
@@ -20,7 +20,7 @@ def add_rolling_features(df, cols, rolling_look_back):
 
 def add_look_back(df, cols, look_back):
     for col in cols:
-        for i in range(0,look_back-1):
+        for i in range(0,look_back):
             df[col+'-'+str(i)] = df[col].shift(i)
             df[col+'_V_'+str(i)] = (df[col].shift(i) - df[col].shift(i + 1)) / df[col].shift(i + 1)
     return df
@@ -30,10 +30,11 @@ def add_month_variation_target(df, target):
     rolling_back = df[target].rolling(window=four_weeks).sum()#.mean()
     rolling_ahead =  df[target].shift(-1) + df[target].shift(-2) + df[target].shift(-3) + df[target].shift(-4) #df[target].shift(-1) + df[target].shift(-2) + df[target].shift(-3) + df[target].shift(-4)
     month_variation_Series = (rolling_ahead - rolling_back) / rolling_back
-    quantile_85 = month_variation_Series.quantile(0.75)
-    print(quantile_85)
-    df['month_variation'] = month_variation_Series.apply(lambda x : 1 if x > quantile_85 else 0)
+    quantile = month_variation_Series.quantile(0.75)
+    print(quantile)
+    df['month_variation'] = month_variation_Series.apply(lambda x : 1 if x > quantile else 0)
     df.dropna(inplace = True)
+    df = df.drop(df.tail(4).index)
     return df
 
 def add_one_step_target(df, target):
@@ -80,6 +81,8 @@ for brand in perimeter:
     df_1.dropna(inplace = True)
     df_1.to_csv(f'train/{brand}.csv', index_label='date')
 
+    X_forecast = df.tail(1).drop(target, axis = 1)
+    X_forecast.to_csv(f'train_month_change/{brand}_X_forecast.csv', index_label='date')
     df_m = set_target(df.copy(deep = True), 'month change')
     df_m.dropna(inplace = True)
     df_m.to_csv(f'train_month_change/{brand}.csv', index_label='date')
