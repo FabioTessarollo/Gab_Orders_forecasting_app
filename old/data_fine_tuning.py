@@ -1,7 +1,7 @@
 from sklearn.preprocessing import MinMaxScaler
 
 from xgboost import XGBClassifier
-from sklearn.model_selection import GridSearchCV
+import optuna
 from sklearn.model_selection import TimeSeriesSplit
 from scipy.fft import fft
 
@@ -10,7 +10,7 @@ from xgboost import plot_importance, plot_tree
 
 import numpy as np
 import pandas as pd
-import itertools
+import itertools    
 
 
 
@@ -26,29 +26,6 @@ scores_df = pd.DataFrame(columns = ['brand', 'score', 'features', 'params'])
 cv_splits = 3
 tscv = TimeSeriesSplit(n_splits = cv_splits)  
 
-parameters = {
-    'nthread': [4],
-    'objective': ['binary:logistic'], 
-    'learning_rate': [0.06, 0.07, 0.08],
-    'max_depth': [6, 7, 8],
-    'min_child_weight': [4, 5, 6],
-    'subsample': [0.7, 0.8, 0.9],
-    'colsample_bytree': [0.7, 0.8],
-    'n_estimators': [500, 1000],
-    'scale_pos_weight': [1, 2, 3, 4, 5]
-}
-
-param_combinations = list(itertools.product(
-    parameters['nthread'],
-    parameters['objective'],
-    parameters['learning_rate'],
-    parameters['max_depth'],
-    parameters['min_child_weight'],
-    parameters['subsample'],
-    parameters['colsample_bytree'],
-    parameters['n_estimators'],
-    parameters['scale_pos_weight']
-))
 
 def add_row_to_df(df, dict_row):
     return pd.concat([df, pd.DataFrame(dict_row)], ignore_index=True)
@@ -62,9 +39,9 @@ def get_feature_comb_score(brand, features_comb):
 
     #df = df[df.index <= '2022-03-31'] ###########################--------------------------------overfitting extra test
 
-    df['month'] = df['month'].astype("category")
-    df['day'] = df['day'].astype("category")
-    df['month_variation'] = df['month_variation'].astype("category")
+    df['month'].astype("category")
+    df['day'].astype("category")
+    df['month_variation'].astype("category")
 
     df = df[[target] + [c for c in features_comb if c in df.columns]]
 
@@ -76,30 +53,27 @@ def get_feature_comb_score(brand, features_comb):
     X = df[X_cols]
     y = df[[target]]
 
-
     best_score = 0
-    #divider = 0
-    #weight = 0
     best_params = None
     best_features_by_importance = []
 
-    for combo in param_combinations:
 
+    def objective(trial):
         params = {
-            'nthread': combo[0],
-            'objective': combo[1],
-            'learning_rate': combo[2],
-            'max_depth': combo[3],
-            'min_child_weight': combo[4],
-            'subsample': combo[5],
-            'colsample_bytree': combo[6],
-            'n_estimators': combo[7],
-            'scale_pos_weight': combo[8]
+            'nthread': 4,
+            'objective': 'reg:squarederror', 
+            'n_estimators': trial.suggest_int('n_estimators', 400, 600),
+            'max_depth': trial.suggest_int('max_depth', 3, 7),
+            'learning_rate': trial.suggest_uniform('learning_rate', 0.05, 0.08),
+            'subsample': trial.suggest_uniform('subsample', 0.6, 0.85),
+            'colsample_bytree': trial.suggest_uniform('colsample_bytree', 0.55, 0.9),
+            'min_child_weight':trial.suggest_int('min_child_weight', 4, 6),
+            'scale_pos_weight':trial.suggest_int('scale_pos_weight', 1, 5)
         }
 
-        f1_values = []
-
         xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1')
+
+        f1_values = []
 
         for train_index, test_index in tscv.split(X):
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
@@ -130,24 +104,19 @@ def get_feature_comb_score(brand, features_comb):
             #divider = divider + weight
             f1_values.append(f1) #*weight
 
-        final_score = final_score = np.mean(f1_values)#sum(f1_values)/divider
+        feature_scores = xgb.get_booster().get_score(importance_type='weight')
+        sorted_features = sorted(feature_scores.items(), key=lambda x: x[1], reverse=True)
+        best_features_by_importance = list(pd.DataFrame(sorted_features)[0])
 
-        if final_score > best_score:
-            best_score = final_score
-            best_params = params
-            feature_scores = xgb.get_booster().get_score(importance_type='weight') #basata soltanto sull'ultimo split!
-            sorted_features = sorted(feature_scores.items(), key=lambda x: x[1], reverse=True)
-            best_features_by_importance = list(pd.DataFrame(sorted_features)[0])
-            y_pred_best = y_pred
-            y_test_best = y_test
+        return np.mean(f1_values)
+    
 
-    #print(f"Performed with a F1 of: {f1_values}")
-    #print(f"Most important features: {features_by_importance}")
-    print(list(y_pred_best[target]))
-    print(list(y_test_best[target]))
-    print(f"Parameters: {best_params}")
-    print(f"F1 score: {best_score}")
-    return best_features_by_importance, best_params, best_score
+    study = optuna.create_study(direction='maximize')
+    study.optimize(objective, n_trials=100)
+
+    print(f"Parameters: {study.best_params}")
+    print(f"F1 score: {study.best_value}")
+    return best_features_by_importance, study.best_params, best_score
 
 
 for brand in perimeter:
@@ -163,7 +132,7 @@ for brand in perimeter:
             max_score = score
     scores_df = add_row_to_df(scores_df, best)
 
-scores_df.to_csv('train/scores_df.csv')
+scores_df.to_csv('train/scores_df_optuna.csv')
 
 #'brand', 'score', 'features', 'params'
 

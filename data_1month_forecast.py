@@ -26,9 +26,9 @@ for brand in perimeter:
     X_pred = pd.read_csv(f'train_month_change/{brand}_X_forecast.csv', index_col='date')
     df = pd.concat([df, X_pred], ignore_index=True)
 
-    df['month'].astype("category")  #does this work like an inplace
-    df['day'].astype("category")
-    df['month_variation'].astype("category")
+    df['month'] = df['month'].astype("category")
+    df['day'] = df['day'].astype("category")
+    df['month_variation'] = df['month_variation'].astype("category")
 
     df = df[features + [target]]
 

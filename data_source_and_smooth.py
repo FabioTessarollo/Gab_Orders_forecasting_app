@@ -25,14 +25,14 @@ df_google_im.index = pd.to_datetime(df_google_im.index)
 #df_ppi_leather = df_ppi_leather.ffill()
 
 ticker = 'MC.PA'
-start_date = '2019-05-24'
+start_date = '2018-11-25'
 end_date = '2024-12-31'
 stock_data = yf.download(ticker, start=start_date, end=end_date, interval='1d')
 lvmh_stock_price = pd.DataFrame(stock_data['Close'].resample('W-SUN').last())
 lvmh_stock_price = lvmh_stock_price.rename(columns= {'Close': 'lvmh_stock_price'})
 
 ticker = 'KER.PA'
-start_date = '2019-05-24'
+start_date = '2018-11-25'
 end_date = '2024-12-31'
 stock_data = yf.download(ticker, start=start_date, end=end_date, interval='1d')
 kering_stock_price = pd.DataFrame(stock_data['Close'].resample('W-SUN').last())
