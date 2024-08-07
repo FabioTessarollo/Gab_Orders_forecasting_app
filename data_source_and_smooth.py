@@ -18,12 +18,6 @@ df_google_im = pd.read_csv('google_trends.csv')
 df_google_im.set_index('date', inplace = True)
 df_google_im.index = pd.to_datetime(df_google_im.index)
 
-#df_ppi_leather = pd.read_csv('Italian_leather_manuf_price.csv')
-#df_ppi_leather.set_index('date', inplace = True)
-#df_ppi_leather.index = pd.to_datetime(df_ppi_leather.index)
-#df_ppi_leather = df_ppi_leather.resample('W-SUN').last()
-#df_ppi_leather = df_ppi_leather.ffill()
-
 ticker = 'MC.PA'
 start_date = '2018-11-25'
 end_date = '2024-12-31'
@@ -101,7 +95,6 @@ for brand in perimeter:
     df['date'] = df['date'].apply(get_sunday_of_week)
     df = df.groupby(['date', 'brand']).agg({
         'qty':'sum',
-        #'price':'mean'
     }).reset_index()
     df.set_index('date', inplace = True)
 
@@ -119,19 +112,11 @@ for brand in perimeter:
     df = df.ffill()
 
     df['qty'] = df['qty'].ewm(alpha = 0.5, adjust=True).mean()
-    #df['price'] = df['price'].ewm(alpha = 0.2, adjust=True).mean()
 
-    #mean_price = df['price'].mean()
-    #q = df['price'].quantile(0.8)
-    #df.loc[df['price'] > q, 'price'] = mean_price
-
-    ########google imm data
+    ########google data
     if brand != 'ALL':
         df = pd.merge(df, df_google_im[[brand]], how = 'left', left_index=True, right_index=True)
         df = df.rename(columns = {brand: 'Google_imm'})
-
-    ########Italian_leather_manuf_price.csv
-    #df = pd.merge(df, df_ppi_leather, how = 'left', left_index=True, right_index=True)
 
     #######stocks
     df = pd.merge(df, lvmh_stock_price, how = 'left', left_index=True, right_index=True)
@@ -141,7 +126,7 @@ for brand in perimeter:
 
     df = df.ffill()
 
-    df.to_csv(f'{brand}.csv', index_label='date')
+    df.to_csv(f'sourcing/{brand}.csv', index_label='date')
 
     #long format
     #df_long = pd.DataFrame(columns = ['ds', 'value'])

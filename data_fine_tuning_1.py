@@ -12,14 +12,16 @@ import numpy as np
 import pandas as pd
 import itertools
 
-
+#TOGLIERE CASI ISOLATI DI MONTH VARIATION!
 
 
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
 target = 'month_variation'
 #initial_features_comb = ['qty_V_0', 'qty-2', 'qty-1', 'Google_imm_rol_mean', 'qty_rol_std', 'qty_V_4', 'qty_V_3', 'qty_V_1', 'Google_imm_rol_std', 'kering_stock_price_rol_mean', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_std', 'qty-0', 'month']
 #initial_features_comb = ['qty_rol_mean', 'qty_rol_std', 'qty_rol_max', 'qty_rol_min', 'Google_imm_rol_mean', 'Google_imm_rol_std', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_mean', 'kering_stock_price_rol_std', 'qty-0', 'qty_V_0', 'qty-1', 'qty_V_1', 'qty-2', 'qty_V_2', 'qty-3', 'qty_V_3', 'qty-4', 'qty_V_4', 'qty-5', 'qty_V_5', 'month', 'day']
-initial_features_comb = ['qty_rol_mean', 'qty_rol_std', 'Google_imm_rol_mean', 'Google_imm_rol_std', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_mean', 'kering_stock_price_rol_std', 'qty-0', 'qty_V_0', 'qty-1', 'qty_V_1', 'qty-2', 'qty_V_2', 'qty_V_3', 'qty_V_4', 'qty_V_5', 'month']
+initial_features_comb = ['qty_rol_mean', 'qty_rol_std', 'Google_imm_rol_mean', 'Google_imm_rol_std', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_mean', 'kering_stock_price_rol_std', 'qty-0', 'qty_V_0', 'qty-1', 'qty_V_1', 'qty-2', 'qty_V_2', 'qty_V_3', 'qty_V_4', 'qty_V_5']
+cat_cols = ['month_1','month_2','month_3','month_4','month_5','month_6','month_7','month_8','month_9','month_10','month_11','month_12','week_of_month_1','week_of_month_2','week_of_month_3','week_of_month_4','week_of_month_5']
+initial_features_comb = initial_features_comb + cat_cols
 
 scores_df = pd.DataFrame(columns = ['brand', 'score', 'features', 'params']) 
 
@@ -62,20 +64,17 @@ def get_feature_comb_score(brand, features_comb):
 
     #df = df[df.index <= '2022-03-31'] ###########################--------------------------------overfitting extra test
 
-    df['month'] = df['month'].astype("category")
-    df['day'] = df['day'].astype("category")
-    df['month_variation'] = df['month_variation'].astype("category")
+    for col in cat_cols:
+        df[col] = df[col].astype("category")
 
     df = df[[target] + [c for c in features_comb if c in df.columns]]
 
-    cat_cols = ['month', 'day']
     X_cat_cols = [col for col in df.columns if col in cat_cols]
     X_scalar_cols = [col for col in df.columns if col != target and col not in X_cat_cols]
 
     X_cols = [col for col in df.columns if col != target]
     X = df[X_cols]
     y = df[[target]]
-
 
     best_score = 0
     #divider = 0
@@ -99,7 +98,7 @@ def get_feature_comb_score(brand, features_comb):
 
         f1_values = []
 
-        xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1')
+        xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1', enable_categorical = True)
 
         for train_index, test_index in tscv.split(X):
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
@@ -155,7 +154,7 @@ for brand in perimeter:
     initial_features, params, score = get_feature_comb_score(brand, initial_features_comb)
     best = {'brand': brand, 'score': score, 'features': [initial_features], 'params': [params]}
     max_score = score
-    for n in range(3, 11):
+    for n in range(4, 11):
         comb = initial_features[:n]
         features, params, score = get_feature_comb_score(brand, comb)
         if score > max_score:

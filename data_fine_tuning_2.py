@@ -13,6 +13,8 @@ import pandas as pd
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
 scores_df = pd.read_csv('train/scores_df.csv')
 target = 'month_variation'
+cat_cols = ['month_1','month_2','month_3','month_4','month_5','month_6','month_7','month_8','month_9','month_10','month_11','month_12','week_of_month_1','week_of_month_2','week_of_month_3','week_of_month_4','week_of_month_5']
+
 
 scores_df_optuna = pd.DataFrame(columns = ['brand', 'score', 'features', 'params']) 
 
@@ -46,13 +48,11 @@ for brand in perimeter:
 
     df = pd.read_csv(f'train_month_change/{brand}.csv', index_col='date')
 
-    #df['month'] = df['month'].astype("category")
-    #df['day'] = df['day'].astype("category")
-    #df['month_variation'] = df['month_variation'].astype("category")
+    for col in cat_cols:
+        df[col] = df[col].astype("category")
 
     df = df[features + [target]]
 
-    cat_cols = ['month', 'day']
     X_cat_cols = [col for col in df.columns if col in cat_cols]
     X_scalar_cols = [col for col in df.columns if col != target and col not in X_cat_cols]
 
@@ -60,7 +60,7 @@ for brand in perimeter:
     X = df[X_cols]
     y = df[[target]]
 
-    test_index_start = int(len(X)*0.67)
+    test_index_start = int(len(X)*0.74)
     train_index = list(range(0, test_index_start))
     test_index = list(range(test_index_start, len(X)))
     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
@@ -98,7 +98,7 @@ for brand in perimeter:
             'scale_pos_weight':trial.suggest_int('scale_pos_weight', *get_bounds(params_grid, 'scale_pos_weight', True))
         }
 
-        xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1')  
+        xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1', enable_categorical = True)
 
         xgb.fit(X_train_scaled, y_train)
         
@@ -112,9 +112,9 @@ for brand in perimeter:
     study.optimize(objective, n_trials=100)
 
     row = {'brand': brand, 'score': study.best_value, 'features': [features], 'params': [study.best_params]}
-    scores_df_optuna = add_row_to_df(scores_df, row)
+    scores_df_optuna = add_row_to_df(scores_df_optuna, row)
 
-    scores_df_optuna.to_csv('train/scores_df_optuna.csv')
+scores_df_optuna.to_csv('train/scores_df_optuna.csv')
 
 
         
