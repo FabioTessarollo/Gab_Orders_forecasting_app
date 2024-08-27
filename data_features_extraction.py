@@ -33,6 +33,11 @@ def add_month_variation_target(df, target):
     quantile = month_variation_Series.quantile(0.75)
     print(quantile)
     df['month_variation'] = month_variation_Series.apply(lambda x : 1 if x > quantile else 0)
+    df['prev_to_positive'] =  df['month_variation'].shift(1)
+    df['next_to_positive'] =  df['month_variation'].shift(-1)
+    df['isolate_check'] = df['month_variation'] + df['prev_to_positive'] +  df['next_to_positive']
+    df['month_variation'] = df['isolate_check'].apply(lambda x : 1 if x > 1 else 0)
+    df.drop(['prev_to_positive', 'next_to_positive', 'isolate_check'], axis = 1, inplace = True)
     df.dropna(inplace = True)
     df = df.drop(df.tail(4).index)
     return df

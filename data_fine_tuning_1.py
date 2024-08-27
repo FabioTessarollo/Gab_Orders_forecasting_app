@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import itertools
 
-#TOGLIERE CASI ISOLATI DI MONTH VARIATION!
+#CREARE VALIDATION SET PER SELEZIONE FEATURES?
 
 
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
@@ -60,7 +60,7 @@ def get_feature_comb_score(brand, features_comb):
 
     print(f"Features combination: {' '.join(features_comb)}")
 
-    df = pd.read_csv(f'train_month_change/{brand}.csv', index_col='date')
+    df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
 
     #df = df[df.index <= '2022-03-31'] ###########################--------------------------------overfitting extra test
 
