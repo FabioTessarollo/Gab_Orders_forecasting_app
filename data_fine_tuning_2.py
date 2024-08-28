@@ -46,7 +46,7 @@ for brand in perimeter:
     features = eval(brand_p['features'].values[0])
     params_grid = eval(brand_p['params'].values[0])
 
-    df = pd.read_csv(f'train_month_change/{brand}.csv', index_col='date')
+    df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
 
     for col in cat_cols:
         df[col] = df[col].astype("category")

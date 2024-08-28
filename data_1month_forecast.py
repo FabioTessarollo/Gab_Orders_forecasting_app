@@ -14,29 +14,28 @@ from itertools import combinations
 
 
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
-train_result = pd.read_csv('train/scores_df.csv')
+train_result = pd.read_csv('train/scores_df_optuna.csv')
 target = 'month_variation'
+cat_cols = ['month_1','month_2','month_3','month_4','month_5','month_6','month_7','month_8','month_9','month_10','month_11','month_12','week_of_month_1','week_of_month_2','week_of_month_3','week_of_month_4','week_of_month_5']
 
 for brand in perimeter:
     brand_p = train_result[train_result['brand'] == brand]
     features = eval(brand_p['features'].values[0])
     params = eval(brand_p['params'].values[0])
 
-    df = pd.read_csv(f'train_month_change/{brand}.csv', index_col='date')
-    X_pred = pd.read_csv(f'train_month_change/{brand}_X_forecast.csv', index_col='date')
+    df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
+    X_pred = pd.read_csv(f'features_extraction/{brand}_X_forecast.csv', index_col='date')
     df = pd.concat([df, X_pred], ignore_index=True)
 
-    df['month'] = df['month'].astype("category")
-    df['day'] = df['day'].astype("category")
-    df['month_variation'] = df['month_variation'].astype("category")
+    for col in cat_cols:
+        df[col] = df[col].astype("category")
 
     df = df[features + [target]]
 
-    cat_cols = ['month', 'day']
     X_cat_cols = [col for col in df.columns if col in cat_cols]
     X_scalar_cols = [col for col in df.columns if col != target and col not in X_cat_cols]
 
-    xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1')
+    xgb = XGBClassifier(**params, verbosity = 0, scoring = 'f1', enable_categorical = True)
 
     X_cols = [col for col in df.columns if col != target]
     X = df[X_cols]
