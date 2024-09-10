@@ -60,7 +60,7 @@ for brand in perimeter:
     X = df[X_cols]
     y = df[[target]]
 
-    test_index_start = int(len(X)*0.74)
+    test_index_start = int(len(X)*0.6)
     train_index = list(range(0, test_index_start))
     test_index = list(range(test_index_start, len(X)))
     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
