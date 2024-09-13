@@ -48,6 +48,8 @@ for brand in perimeter:
 
     df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
 
+    df = df[df.index <= '2023-07-31'] ###########################--------------------------------overfitting extra test
+
     for col in cat_cols:
         df[col] = df[col].astype("category")
 

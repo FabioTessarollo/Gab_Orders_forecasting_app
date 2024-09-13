@@ -62,7 +62,7 @@ def get_feature_comb_score(brand, features_comb):
 
     df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
 
-    #df = df[df.index <= '2022-03-31'] ###########################--------------------------------overfitting extra test
+    df = df[df.index <= '2023-07-31'] ###########################--------------------------------overfitting extra test
 
     for col in cat_cols:
         df[col] = df[col].astype("category")
@@ -142,8 +142,8 @@ def get_feature_comb_score(brand, features_comb):
 
     #print(f"Performed with a F1 of: {f1_values}")
     #print(f"Most important features: {features_by_importance}")
-    print(list(y_pred_best[target]))
     print(list(y_test_best[target]))
+    print(list(y_pred_best[target]))
     print(f"Parameters: {best_params}")
     print(f"F1 score: {best_score}")
     return best_features_by_importance, best_params, best_score
