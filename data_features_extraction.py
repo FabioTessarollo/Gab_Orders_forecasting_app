@@ -42,8 +42,6 @@ def add_month_variation_target(df, target):
     df = df.drop(df.tail(4).index)
     return df
 
-#def clear_single_spikes:
-
 def add_one_step_target(df, target):
     df[target +'+1'] = df[target].shift(-1)
     return df
