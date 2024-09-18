@@ -58,12 +58,12 @@ for brand in perimeter:
     y_pred = pd.DataFrame(xgb.predict(X_test_scaled), columns = [target])
 
     f1 = f1_score(y_test, y_pred, average = 'binary', pos_label=1)
-    #print(list(y_test[target]))
-    #print(list(y_pred[target]))
+    print(list(y_test[target]))
+    print(list(y_pred[target]))
 
-    #print(f"{brand}: {f1}")
+    print(f"{brand}: {f1}")
 
-    print(f"{brand}_pred =  {list(y_pred[target])}")
+    #print(f"{brand}_pred =  {list(y_pred[target])}")
 
 
 
