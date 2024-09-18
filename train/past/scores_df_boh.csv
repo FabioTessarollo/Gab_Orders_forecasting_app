@@ -1,5 +1,0 @@
-,brand,features,score
-0,BAL,"['qty_V_3', 'lvmh_stock_price_rol_mean', 'kering_stock_price_rol_mean', 'month', 'qty_V_1', 'qty_V_4', 'qty_V_0']",1.0
-1,YSL,"['kering_stock_price_rol_mean', 'qty_V_0', 'qty_rol_std', 'qty_V_1', 'qty_V_3', 'month', 'qty_V_4']",0.7337461300309598
-2,GIV,"['lvmh_stock_price_rol_mean', 'kering_stock_price_rol_mean', 'qty-2', 'Google_imm_rol_mean']",1.0
-3,ALL,"['kering_stock_price_rol_mean', 'qty_V_0', 'kering_stock_price_rol_std', 'qty_rol_std', 'month']",0.5753086419753086

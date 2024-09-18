@@ -12,16 +12,11 @@ import numpy as np
 import pandas as pd
 import itertools
 
-#CREARE VALIDATION SET PER SELEZIONE FEATURES?
-
-
-perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
+perimeter = ['GIV', 'ALL']#, 'YSL', 'GIV', 'ALL']
 target = 'month_variation'
-#initial_features_comb = ['qty_V_0', 'qty-2', 'qty-1', 'Google_imm_rol_mean', 'qty_rol_std', 'qty_V_4', 'qty_V_3', 'qty_V_1', 'Google_imm_rol_std', 'kering_stock_price_rol_mean', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_std', 'qty-0', 'month']
-#initial_features_comb = ['qty_rol_mean', 'qty_rol_std', 'qty_rol_max', 'qty_rol_min', 'Google_imm_rol_mean', 'Google_imm_rol_std', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_mean', 'kering_stock_price_rol_std', 'qty-0', 'qty_V_0', 'qty-1', 'qty_V_1', 'qty-2', 'qty_V_2', 'qty-3', 'qty_V_3', 'qty-4', 'qty_V_4', 'qty-5', 'qty_V_5', 'month', 'day']
-initial_features_comb = ['qty_rol_mean', 'qty_rol_std', 'Google_imm_rol_mean', 'Google_imm_rol_std', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_mean', 'kering_stock_price_rol_std', 'qty-0', 'qty_V_0', 'qty-1', 'qty_V_1', 'qty-2', 'qty_V_2', 'qty_V_3', 'qty_V_4', 'qty_V_5']
+#initial_features_comb = ['qty_rol_mean', 'qty_rol_std', 'Google_imm_rol_mean', 'Google_imm_rol_std', 'lvmh_stock_price_rol_mean', 'lvmh_stock_price_rol_std', 'kering_stock_price_rol_mean', 'kering_stock_price_rol_std', 'qty-0', 'qty_V_0', 'qty-1', 'qty_V_1', 'qty-2', 'qty_V_2', 'qty_V_3', 'qty_V_4', 'qty_V_5']
 cat_cols = ['month_1','month_2','month_3','month_4','month_5','month_6','month_7','month_8','month_9','month_10','month_11','month_12','week_of_month_1','week_of_month_2','week_of_month_3','week_of_month_4','week_of_month_5']
-initial_features_comb = initial_features_comb + cat_cols
+#initial_features_comb = initial_features_comb + cat_cols
 
 scores_df = pd.DataFrame(columns = ['brand', 'score', 'features', 'params']) 
 
@@ -56,13 +51,11 @@ def add_row_to_df(df, dict_row):
     return pd.concat([df, pd.DataFrame(dict_row)], ignore_index=True)
 
 
-def get_feature_comb_score(brand, features_comb):
+def get_feature_comb_score(df, features_comb):
 
     print(f"Features combination: {' '.join(features_comb)}")
 
-    df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
-
-    df = df[df.index <= '2023-07-31'] ###########################--------------------------------overfitting extra test
+    df = df[df.index <= '2023-02-31'] ###########################--------------------------------overfitting extra test
 
     for col in cat_cols:
         df[col] = df[col].astype("category")
@@ -151,12 +144,15 @@ def get_feature_comb_score(brand, features_comb):
 
 for brand in perimeter:
     print(f"\n###########################Brand {brand}:")
-    initial_features, params, score = get_feature_comb_score(brand, initial_features_comb)
+    df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
+    initial_features_comb = list(df.columns)
+    initial_features_comb.remove(target)
+    initial_features, params, score = get_feature_comb_score(df.copy(), initial_features_comb)
     best = {'brand': brand, 'score': score, 'features': [initial_features], 'params': [params]}
     max_score = score
-    for n in range(4, 11):
+    for n in range(4, 12):
         comb = initial_features[:n]
-        features, params, score = get_feature_comb_score(brand, comb)
+        features, params, score = get_feature_comb_score(df.copy(), comb)
         if score > max_score:
             best = {'brand': brand, 'score': score, 'features': [features], 'params': [params]}
             max_score = score

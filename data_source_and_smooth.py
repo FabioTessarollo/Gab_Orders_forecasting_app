@@ -18,6 +18,7 @@ df_google_im = pd.read_csv('google_trends.csv')
 df_google_im.set_index('date', inplace = True)
 df_google_im.index = pd.to_datetime(df_google_im.index)
 
+#LVMH
 ticker = 'MC.PA'
 start_date = '2018-11-25'
 end_date = '2024-12-31'
@@ -25,12 +26,21 @@ stock_data = yf.download(ticker, start=start_date, end=end_date, interval='1d')
 lvmh_stock_price = pd.DataFrame(stock_data['Close'].resample('W-SUN').last())
 lvmh_stock_price = lvmh_stock_price.rename(columns= {'Close': 'lvmh_stock_price'})
 
+#KERING
 ticker = 'KER.PA'
 start_date = '2018-11-25'
 end_date = '2024-12-31'
 stock_data = yf.download(ticker, start=start_date, end=end_date, interval='1d')
 kering_stock_price = pd.DataFrame(stock_data['Close'].resample('W-SUN').last())
 kering_stock_price = kering_stock_price.rename(columns= {'Close': 'kering_stock_price'})
+
+#FTSE MIB 
+ticker = 'FTSEMIB.MI'
+start_date = '2018-11-25'
+end_date = '2024-12-31'
+stock_data = yf.download(ticker, start=start_date, end=end_date, interval='1d')
+ftse_mib_price = pd.DataFrame(stock_data['Close'].resample('W-SUN').last())
+ftse_mib_price = ftse_mib_price.rename(columns= {'Close': 'ftse_mib_price'})
 
 def get_sunday_of_week(date):
     if date.weekday() == 6:
@@ -121,6 +131,7 @@ for brand in perimeter:
     #######stocks
     df = pd.merge(df, lvmh_stock_price, how = 'left', left_index=True, right_index=True)
     df = pd.merge(df, kering_stock_price, how = 'left', left_index=True, right_index=True)
+    df = pd.merge(df, ftse_mib_price, how = 'left', left_index=True, right_index=True)
 
     df.drop('brand', axis = 1, inplace = True)
 

@@ -1,0 +1,2 @@
+,brand,score,features,params
+0,GIV,0.7368421052631579,"['kering_stock_price_rol_std', 'qty_V_7', 'qty-4', 'kering_stock_price_V_0', 'qty-2', 'ftse_mib_price_V_2', 'lvmh_stock_price_V_3', 'qty-1', 'qty-3']","{'n_estimators': 427, 'max_depth': 6, 'learning_rate': 0.06361192115111594, 'subsample': 0.7833263028794226, 'colsample_bytree': 0.9400511743480726, 'min_child_weight': 6, 'scale_pos_weight': 5}"

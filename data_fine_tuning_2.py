@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 
 
-perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
-scores_df = pd.read_csv('train/scores_df.csv')
+perimeter = ['GIV']
+scores_df = pd.read_csv('train/scores_df - GIV.csv')
 target = 'month_variation'
 cat_cols = ['month_1','month_2','month_3','month_4','month_5','month_6','month_7','month_8','month_9','month_10','month_11','month_12','week_of_month_1','week_of_month_2','week_of_month_3','week_of_month_4','week_of_month_5']
 
@@ -48,7 +48,7 @@ for brand in perimeter:
 
     df = pd.read_csv(f'features_extraction/{brand}.csv', index_col='date')
 
-    df = df[df.index <= '2023-07-31'] ###########################--------------------------------overfitting extra test
+    df = df[df.index <= '2023-02-31'] ###########################--------------------------------overfitting extra test
 
     for col in cat_cols:
         df[col] = df[col].astype("category")
@@ -116,7 +116,7 @@ for brand in perimeter:
     row = {'brand': brand, 'score': study.best_value, 'features': [features], 'params': [study.best_params]}
     scores_df_optuna = add_row_to_df(scores_df_optuna, row)
 
-scores_df_optuna.to_csv('train/scores_df_optuna.csv')
+scores_df_optuna.to_csv('train/scores_df_optuna - GIV.csv')
 
 
         

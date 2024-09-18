@@ -37,8 +37,8 @@ for brand in perimeter:
     X = df[X_cols]
     y = df[[target]]
 
-    train_index = X.index <= '2023-07-31'
-    test_index = X.index > '2023-07-31'
+    train_index = X.index <= '2023-02-31'
+    test_index = X.index > '2023-02-31'
     X_train, X_test = X.loc[train_index], X.loc[test_index]
     y_train, y_test = y.loc[train_index], y.loc[test_index]         
 

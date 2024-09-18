@@ -1,0 +1,2 @@
+,brand,score,features,params
+0,YSL,0.9166666666666666,"['qty_V_0', 'ftse_mib_price-2', 'qty-3', 'qty_V_1', 'kering_stock_price_rol_min', 'kering_stock_price_V_4', 'ftse_mib_price_V_2', 'qty_rol_min', 'lvmh_stock_price_V_3', 'Google_imm_rol_std', 'qty_V_2']","{'n_estimators': 563, 'max_depth': 6, 'learning_rate': 0.04859518654490238, 'subsample': 0.9991142736033566, 'colsample_bytree': 0.6393358032920277, 'min_child_weight': 5, 'scale_pos_weight': 2}"

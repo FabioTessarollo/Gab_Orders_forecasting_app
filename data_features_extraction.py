@@ -1,6 +1,8 @@
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import TimeSeriesSplit
 from scipy.fft import fft
+import warnings
+warnings.filterwarnings('ignore')
 
 import numpy as np
 import pandas as pd
@@ -8,7 +10,7 @@ import pandas as pd
 target = 'qty'
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
 rolling_look_back = 4
-look_back = 6 #utilizzare -1, -2, -3, -4, -8 ?
+look_back = 8
 
 def add_rolling_features(df, cols, rolling_look_back):
     for col in cols:
@@ -33,11 +35,11 @@ def add_month_variation_target(df, target):
     quantile = month_variation_Series.quantile(0.75)
     print(quantile)
     df['month_variation'] = month_variation_Series.apply(lambda x : 1 if x > quantile else 0)
-    df['prev_to_positive'] =  df['month_variation'].shift(1)
-    df['next_to_positive'] =  df['month_variation'].shift(-1)
-    df['isolate_check'] = df['month_variation'] + df['prev_to_positive'] +  df['next_to_positive']
-    df['month_variation'] = df['isolate_check'].apply(lambda x : 1 if x > 1 else 0)
-    df.drop(['prev_to_positive', 'next_to_positive', 'isolate_check'], axis = 1, inplace = True)
+    # df['prev_to_positive'] =  df['month_variation'].shift(1)
+    # df['next_to_positive'] =  df['month_variation'].shift(-1)
+    # df['isolate_check'] = df['month_variation'] + df['prev_to_positive'] +  df['next_to_positive']
+    # df['month_variation'] = df['isolate_check'].apply(lambda x : 1 if x > 1 else 0)
+    # df.drop(['prev_to_positive', 'next_to_positive', 'isolate_check'], axis = 1, inplace = True)
     df.dropna(inplace = True)
     df = df.drop(df.tail(4).index)
     return df
@@ -51,7 +53,6 @@ def add_time_features(df):
     df['date'] = df.index
     df['month'] = df['date'].dt.month
     df['year'] = df['date'].dt.year
-    #df['day'] = df['date'].dt.day)
     df['week_of_month'] = df.groupby(['year', 'month']).cumcount() + 1
     df = pd.get_dummies(df, columns= ['month'])
     df = pd.get_dummies(df, columns= ['week_of_month'])
@@ -80,7 +81,7 @@ for brand in perimeter:
 
     print(brand)
 
-    df = pd.read_csv(f'{brand}.csv', index_col='date')
+    df = pd.read_csv(f'sourcing/{brand}.csv', index_col='date')
     df_features_and_target = df.columns
     df_features = df_features_and_target.drop(target)  
 
