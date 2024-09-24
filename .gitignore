@@ -5,3 +5,6 @@ cred.txt
 .ipynb_checkpoints
 models_exporation.ipynb
 /dev
+/sourcing
+/features_extraction
+/train
