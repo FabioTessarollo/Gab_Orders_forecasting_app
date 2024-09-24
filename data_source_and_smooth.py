@@ -9,8 +9,13 @@ scope = 'BOR'
 
 SERVER = 'GABORCL01'
 DATABASE = 'RVLKPI'
-USERNAME = 'RVLKPI'
-PASSWORD = 'RVLKPI!'
+
+with open('cred.txt', 'r') as file:
+    line = file.readline()
+    user, pswrd = line.split(':')
+    USERNAME = user
+    PASSWORD = pswrd
+
 connectionString = f'DRIVER={{SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
 conn = pyodbc.connect(connectionString)
 
