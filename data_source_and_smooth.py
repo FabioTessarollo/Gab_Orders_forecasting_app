@@ -7,14 +7,9 @@ import yfinance as yf
 perimeter = ['BAL', 'YSL', 'GIV', 'ALL']
 scope = 'BOR'
 
-SERVER = 'GABORCL01'
-DATABASE = 'RVLKPI'
-
 with open('cred.txt', 'r') as file:
     line = file.readline()
-    user, pswrd = line.split(':')
-    USERNAME = user
-    PASSWORD = pswrd
+    SERVER, DATABASE, USERNAME, PASSWORD = line.split(':')
 
 connectionString = f'DRIVER={{SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
 conn = pyodbc.connect(connectionString)
