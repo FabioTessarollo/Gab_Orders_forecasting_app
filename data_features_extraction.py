@@ -54,8 +54,8 @@ def add_time_features(df):
     df['month'] = df['date'].dt.month
     df['year'] = df['date'].dt.year
     df['week_of_month'] = df.groupby(['year', 'month']).cumcount() + 1
-    df = pd.get_dummies(df, columns= ['month'])
-    df = pd.get_dummies(df, columns= ['week_of_month'])
+    df = pd.get_dummies(df, columns= ['month'], dtype=float)
+    df = pd.get_dummies(df, columns= ['week_of_month'], dtype=float)
     df.drop('year', axis = 1, inplace = True)
     df.set_index('date', drop = True, inplace = True)
     return df
