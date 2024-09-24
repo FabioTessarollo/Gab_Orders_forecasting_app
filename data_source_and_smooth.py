@@ -19,7 +19,7 @@ with open('cred.txt', 'r') as file:
 connectionString = f'DRIVER={{SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
 conn = pyodbc.connect(connectionString)
 
-df_google_im = pd.read_csv('google_trends.csv')
+df_google_im = pd.read_csv('sourcing\google_trends.csv')
 df_google_im.set_index('date', inplace = True)
 df_google_im.index = pd.to_datetime(df_google_im.index)
 
